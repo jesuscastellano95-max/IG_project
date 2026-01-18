@@ -13,12 +13,26 @@ from docx import Document
 from docx.shared import Pt
 
 # =====================================================
-# RUTAS (misma carpeta que el .py)
+# RUTAS (estructura del proyecto)
+# IG_project/
+#   src/IG8.py
+#   assets/ (logo + plantilla Word)
+#   data/   (excel)
+#   output/ (word generados)
 # =====================================================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-EXCEL_PATH = os.path.join(BASE_DIR, "excelplantilla.xlsx")
-WORD_TEMPLATE_PATH = os.path.join(BASE_DIR, "cuadro_resultados_general.docx")
-LOGO_PATH = os.path.join(BASE_DIR, "SIIGROUPLOGO.jpg")
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))              # .../IG_project/src
+PROJECT_DIR = os.path.abspath(os.path.join(SRC_DIR, ".."))       # .../IG_project
+
+ASSETS_DIR = os.path.join(PROJECT_DIR, "assets")
+DATA_DIR = os.path.join(PROJECT_DIR, "data")
+OUTPUT_DIR = os.path.join(PROJECT_DIR, "output")
+
+EXCEL_PATH = os.path.join(DATA_DIR, "excelplantilla.xlsx")
+WORD_TEMPLATE_PATH = os.path.join(ASSETS_DIR, "cuadro_resultados_general.docx")
+LOGO_PATH = os.path.join(ASSETS_DIR, "SIIGROUPLOGO.jpg")
+
+# Asegurar que existe la carpeta de salida
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # =====================================================
 # CONFIG ARMAS (preparado para crecer)
@@ -238,7 +252,7 @@ def generar_word_desde_resultados(data: dict):
     set_cell_text(table.cell(7, 4), f"{data['fallos_estopin']} fallos")
     set_cell_text(table.cell(7, 5), data["res_estopin"])
 
-    out_path = os.path.join(BASE_DIR, f"{data['nombre_prueba']}.docx")
+    out_path = os.path.join(OUTPUT_DIR, f"{data['nombre_prueba']}.docx")
     doc.save(out_path)
     return out_path
 
