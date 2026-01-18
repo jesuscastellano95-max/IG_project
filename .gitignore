@@ -10,3 +10,4 @@ output/
 
 .spyproject/
 .vscode/
+data/~$*.xlsx 
