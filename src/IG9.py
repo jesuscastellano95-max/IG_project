@@ -39,9 +39,16 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # =====================================================
 ARMAS = {
     "OTO MELARA 76/62": {
+        "sheet": "OTO_MELARA",
+        "vnom_fields": ["Vnom (m/s)"],
         "pmed_lim": 3285.23,
         "pmax_lim": 3522.55,
         "desv_lim": 5.0,
+    },
+    "Granadas de mortero rompedoras y fumígenas": {
+        "sheet": "MORTERO",
+        "vnom_fields": ["Vnom carga 1 (m/s)", "Vnom carga máxima (m/s)"],
+        # límites / constantes del mortero las meteremos más adelante
     }
 }
 
@@ -97,7 +104,8 @@ def contar_fallos(df: pd.DataFrame, col: str) -> int:
 # =====================================================
 RESULTADOS = None  # dict con valores y calificaciones
 ARMA_SELECCIONADA = None
-VNOM_GLOBAL = None
+VNOMS_GLOBAL = {}  # para armas con 1 o 2 velocidades nominales
+
 
 # =====================================================
 # CÁLCULO (MISMA LÓGICA QUE IG7) — NO genera Word
@@ -515,21 +523,40 @@ def abrir_pantalla_2(arma: str, vnom: float):
 # =====================================================
 
 def continuar_a_pantalla_2():
+    global VNOMS_GLOBAL
+
     arma = combo_arma.get().strip()
     if arma not in ARMAS:
         messagebox.showerror("Error", "Selecciona un arma válida.")
         return
 
+    cfg = ARMAS.get(arma, {})
+    campos = cfg.get("vnom_fields", ["Vnom (m/s)"])
+
+    vnoms = {}
     try:
-        vnom = convertir_a_float(entry_vnom.get())
+        for c in campos:
+            texto = vnom_entries[c].get()
+            vnoms[c] = convertir_a_float(texto)
     except Exception:
-        messagebox.showerror("Error", "Introduce una velocidad nominal válida (acepta coma o punto).")
+        messagebox.showerror("Error", "Introduce velocidades nominales válidas (acepta coma o punto).")
         return
 
-    abrir_pantalla_2(arma, vnom)
+    VNOMS_GLOBAL = vnoms
+
+    # Para OTO MELARA (1 velocidad), comportamiento idéntico al actual:
+    if len(vnoms) == 1:
+        vnom_unico = list(vnoms.values())[0]
+        abrir_pantalla_2(arma, vnom_unico)
+    else:
+        # Mortero: por ahora solo pasamos una (para no tocar Pantalla 2 todavía)
+        vnom_cmax = vnoms.get("Vnom carga máxima (m/s)", list(vnoms.values())[0])
+        abrir_pantalla_2(arma, vnom_cmax)
 
 ventana1 = tk.Tk()
 ventana1.title("IG8 remasterizado - Inicio")
+ventana1.geometry("700x320")   # ancho x alto (puedes variar)
+ventana1.resizable(False, False)  # opcional: evita que se redimensione
 
 # Logo
 try:
@@ -541,14 +568,38 @@ except Exception:
 
 # Controles
 ttk.Label(ventana1, text="Arma").grid(row=1, column=0, sticky="w", padx=10, pady=6)
-combo_arma = ttk.Combobox(ventana1, values=list(ARMAS.keys()), state="readonly", width=25)
+combo_arma = ttk.Combobox(ventana1, values=list(ARMAS.keys()), state="readonly", width=45)
 combo_arma.grid(row=1, column=1, sticky="w", padx=10, pady=6)
 combo_arma.set("OTO MELARA 76/62")
 
-ttk.Label(ventana1, text="Velocidad nominal del proyectil (m/s)").grid(row=2, column=0, sticky="w", padx=10, pady=6)
-entry_vnom = ttk.Entry(ventana1, width=28)
-entry_vnom.grid(row=2, column=1, sticky="w", padx=10, pady=6)
+# Velocidades nominales (dinámicas)
+ttk.Label(ventana1, text="Velocidades nominales (m/s)").grid(row=2, column=0, sticky="w", padx=10, pady=6)
 
+frame_vnom = ttk.Frame(ventana1)
+frame_vnom.grid(row=2, column=1, sticky="w", padx=10, pady=6)
+
+vnom_entries = {}  # guardaremos aquí las cajas de texto
+
+def actualizar_campos_vnom(*args):
+    # borrar widgets anteriores
+    for w in frame_vnom.winfo_children():
+        w.destroy()
+    vnom_entries.clear()
+
+    arma_sel = combo_arma.get().strip()
+    cfg = ARMAS.get(arma_sel, {})
+    campos = cfg.get("vnom_fields", ["Vnom (m/s)"])
+
+    for i, label in enumerate(campos):
+        ttk.Label(frame_vnom, text=label).grid(row=i, column=0, sticky="w", pady=2)
+        ent = ttk.Entry(frame_vnom, width=12)
+        ent.grid(row=i, column=1, sticky="w", padx=(6, 0), pady=2)
+        vnom_entries[label] = ent
+
+combo_arma.bind("<<ComboboxSelected>>", actualizar_campos_vnom)
+actualizar_campos_vnom()  # crea los campos al arrancar
+
+#Boton continuar
 ttk.Button(ventana1, text="Continuar", command=continuar_a_pantalla_2).grid(
     row=3, column=0, columnspan=2, pady=12
 )
