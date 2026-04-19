@@ -1,13 +1,4 @@
 __pycache__/
 *.pyc
-
-build/
-dist/
-*.spec
-
 output/
-*.docx
-
-.spyproject/
-.vscode/
-data/~$*.xlsx 
+~$*.docx

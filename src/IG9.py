@@ -28,7 +28,7 @@ DATA_DIR = os.path.join(PROJECT_DIR, "data")
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "output")
 
 EXCEL_PATH = os.path.join(DATA_DIR, "excelplantilla.xlsx")
-WORD_TEMPLATE_PATH = os.path.join(ASSETS_DIR, "cuadro_resultados_general.docx")
+WORD_TEMPLATE_PATH = os.path.join(ASSETS_DIR, "tabla_oto_melara.docx")
 LOGO_PATH = os.path.join(ASSETS_DIR, "SIIGROUPLOGO.jpg")
 
 # Asegurar que existe la carpeta de salida
