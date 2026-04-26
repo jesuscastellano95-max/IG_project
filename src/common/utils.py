@@ -120,3 +120,17 @@ def contar_fallos(df: pd.DataFrame, col: str) -> int:
 
     # Contar cuántos son exactamente "fallo"
     return int((s == "fallo").sum())
+
+# =====================================================
+# FORMATEAR CALIFICACIONES PARA MOSTRAR EN PANTALLA/WORD
+# =====================================================
+def formatear_calificacion(texto: str) -> str:
+    """
+    Convierte las calificaciones internas a formato visual con tilde.
+    """
+    mapa = {
+        "UTIL-1": "ÚTIL-1",
+        "UTIL-2": "ÚTIL-2",
+        "INUTIL": "INÚTIL",
+    }
+    return mapa.get(str(texto), str(texto))

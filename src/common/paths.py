@@ -5,41 +5,45 @@ Created on Tue Apr 14 21:30:17 2026
 @author: jesus
 """
 import os
+import sys
 
-# Carpeta src
-SRC_DIR = os.path.dirname(os.path.abspath(__file__))
-#__file__-->ruta del archivo actual (paths.py)
-#os.path.abspath(__file__)-->convierte esto en ruta absoluta
-#os.path.dirname(...) → se queda con la carpeta donde está ese archivo
+# =====================================================
+# DETECTAR SI EL PROGRAMA SE EJECUTA COMO SCRIPT NORMAL
+# O COMO EJECUTABLE (.exe) GENERADO
+# =====================================================
 
-# Carpeta raíz del proyecto (subimos un nivel desde src/common)
-PROJECT_DIR = os.path.abspath(os.path.join(SRC_DIR, "..", ".."))
-#.. significa “subir una carpeta”
-#os.path.join(SRC_DIR, "..", "..") → sube dos niveles:
-#-de common → src
-#-de src → IG_project
-#abspath limpia la ruta
+if getattr(sys, "frozen", False):
+    # Si está empaquetado como .exe, tomamos como base
+    # la carpeta donde está el ejecutable
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    # Si estamos en desarrollo normal, subimos desde:
+    # src/common/paths.py -> src -> IG_project_2
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-# Carpetas principales
-ASSETS_DIR = os.path.join(PROJECT_DIR, "assets")
-DATA_DIR = os.path.join(PROJECT_DIR, "data")
-OUTPUT_DIR = os.path.join(PROJECT_DIR, "output")
-#os.path.join une rutas correctamente
+# =====================================================
+# CARPETAS PRINCIPALES DEL PROYECTO
+# =====================================================
 
-# Archivos comunes
+ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+
+# =====================================================
+# ARCHIVOS COMUNES
+# =====================================================
+
 LOGO_PATH = os.path.join(ASSETS_DIR, "SIIGROUPLOGO.jpg")
 EXCEL_PATH = os.path.join(DATA_DIR, "excelplantilla.xlsx")
-# Plantillas Word
+
+# =====================================================
+# PLANTILLAS WORD
+# =====================================================
+
 OTO_WORD_TEMPLATE_PATH = os.path.join(ASSETS_DIR, "tabla_oto_melara.docx")
-#aquí simplemente está apuntando a archivos especificos dentro de carpetas
 
-# Asegurar carpeta de salida
+# =====================================================
+# ASEGURAR QUE EXISTE LA CARPETA DE SALIDA
+# =====================================================
+
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-#crea la carpeta output si no existe,
-#si ya existe → no da error (exist_ok=True).
-
-##RESUMEN##
-#dirname → dame la carpeta
-#abspath → conviértelo en ruta completa
-#join → une rutas bien
-#makedirs → crea carpeta si no exist

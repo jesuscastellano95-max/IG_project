@@ -1,4 +1,24 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
+
+# Output de tu aplicación
 output/
+
+# Temporales Word / Excel
 ~$*.docx
+~$*.xlsx
+
+# PyInstaller (aunque aún no existan)
+build/
+dist/
+*.spec
+
+# Entornos virtuales (por si usas)
+venv/
+.env/
+
+# Sistema
+.DS_Store
+Thumbs.db
